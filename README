@@ -1,1 +1,4 @@
 This is a set of scripts for cloud server management
+
+uses RSCURL from https://github.com/jsquared/rscurl
+uses AWS from http://timkay.com/aws/

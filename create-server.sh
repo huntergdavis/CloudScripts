@@ -29,6 +29,12 @@ then
 	exit 1;
 fi
 
-echo "You Must Enter A Service Type -s (either amazon or rackspace)"
+if [ "$service" = "rackspace-db" ];
+then
+        ./create-server-rackspace.sh -n $hostname -d 1 
+        exit 1;
+fi
+
+echo "You Must Enter A Service Type -s (either amazon or rackspace or rackspace-db)"
 exit 1;
 
