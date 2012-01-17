@@ -1,9 +1,10 @@
-while getopts "n:h:" opt;
+while getopts "n:h:g:" opt;
 do
         case $opt in
         n) hostname=$OPTARG ;;
-        h) echo "Usage: create-server-amazon -n SERVERNAME"; exit 1 ;;
-        *) echo "Usage: create-server-amazon -n SERVERNAME"; exit 1 ;;
+	g) GROUP_NAME=$OPTARG ;;
+        h) echo "Usage: create-server-amazon -n SERVERNAME (optional -s security group parameter)"; exit 1 ;;
+        *) echo "Usage: create-server-amazon -n SERVERNAME (optioanl -s security group parameter)"; exit 1 ;;
         esac
 done
 
@@ -22,13 +23,19 @@ echo "To change this, you will need to replace the EC2_ACCESS_KEY and EC2_SECRET
 
 if [ -z "$EC2_ACCESS_KEY" ];
 then
-	echo "Must have set $EC2_ACCESS_KEY env variable"
+	echo "Must have set EC2_ACCESS_KEY env variable"
 	exit 0;
 fi
 
 if [ -z "$EC2_SECRET_KEY" ];
 then
-	echo "Must have set $EC2_SECRET_KEY"
+	echo "Must have set EC2_SECRET_KEY"
+	exit 0;
+fi
+
+if [ -z "$GROUP_NAME" ];
+then
+	echo "Must have set GROUP_NAME env variable or passed it in with -g"
 	exit 0;
 fi
 
@@ -41,8 +48,8 @@ echo "Adding a new keypair named" $hostname.key
 chmod 600 ./$hostname.key
 
 # have aws create a new server instance 
-echo "Create Server Instance with Security Group MisoServer"
-./aws run-instances ami-31814f58 -t m1.small -g MisoServer -k $hostname
+echo "Create Server Instance with Security Group $GROUP_NAME"
+./aws run-instances ami-31814f58 -t m1.small -g $GROUP_NAME -k $hostname
 
 # now sleep for a minute while we wait for amazon to setup the server instance
 echo "Sleeping for 60 seconds for Amazon setup time"
