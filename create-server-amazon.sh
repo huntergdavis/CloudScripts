@@ -2,9 +2,9 @@ while getopts "n:h:g:" opt;
 do
         case $opt in
         n) hostname=$OPTARG ;;
-	g) GROUP_NAME=$OPTARG ;;
-        h) echo "Usage: create-server-amazon -n SERVERNAME (optional -s security group parameter)"; exit 1 ;;
-        *) echo "Usage: create-server-amazon -n SERVERNAME (optioanl -s security group parameter)"; exit 1 ;;
+		g) GROUP_NAME=$OPTARG ;;
+        h) echo "Usage: create-server-amazon -n SERVERNAME (optional -g security group parameter)"; exit 1 ;;
+        *) echo "Usage: create-server-amazon -n SERVERNAME (optioanl -g security group parameter)"; exit 1 ;;
         esac
 done
 

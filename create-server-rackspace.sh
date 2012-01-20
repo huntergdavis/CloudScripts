@@ -2,7 +2,7 @@ while getopts "n:h:d:" opt;
 do
         case $opt in
         n) hostname=$OPTARG ;;
-	d) DATABSE_SERVER=true;;
+		d) DATABSE_SERVER=true;;
         h) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 1 parameter creates database-sized server with 8092megs memory instead of the default 2048)"; exit 1 ;;
         *) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 1 parameter creates database-sized server with 8092megs memory instead of the default 2048)"; exit 1 ;;
         esac
