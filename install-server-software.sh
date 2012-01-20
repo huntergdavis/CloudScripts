@@ -135,13 +135,13 @@ $SSHCOMMAND rm /home/ec2-user/setupnpm.sh
 echo "Setting up cloudkick"
 echo [cloudkick] >> cloudkick.repo
 echo name=Cloudkick >> cloudkick.repo
-echo baseurl=http://packages.cloudkick.com/amazon/$basearch >> cloudkick.repo
+echo baseurl=http://packages.cloudkick.com/amazon/i386 >> cloudkick.repo
 echo gpgcheck=0 >> cloudkick.repo
 
 # configuration of cloudkick repo and installation
 scp -q -i $keylocation ./cloudkick.repo ec2-user@$serveraddress:~/cloudkick.repo
 rm ./cloudkick.repo
-$SSHCOMMAND mv /home/ec2-user/cloudkick.repo /etc/yum.repos.d/cloudkick.repo
+$SSHCOMMAND sudo mv /home/ec2-user/cloudkick.repo /etc/yum.repos.d/cloudkick.repo
 $SSHCOMMAND sudo yum install -y cloudkick-agent
 
 # generate the cloudkick configuration file
@@ -164,9 +164,9 @@ echo "local_plugins_path /usr/lib/cloudkick-agent/plugins/" >> ./cloudkick.conf
 # copy over the cloudkick configuration
 scp -q -i $keylocation ./cloudkick.conf ec2-user@$serveraddress:~/cloudkick.conf
 rm ./cloudkick.conf
-$SSHCOMMAND mv /home/ec2-user/cloudkick.conf /etc/cloudkick.conf
-$SSHCOMMAND sudo sudo chkconfig cloudkick-agent on
-$SSHCOMMAND service cloudkick-agent start
+$SSHCOMMAND sudo mv /home/ec2-user/cloudkick.conf /etc/cloudkick.conf
+$SSHCOMMAND sudo chkconfig cloudkick-agent on
+$SSHCOMMAND sudo service cloudkick-agent start
 
 # install new relic agent
 echo "setting up new relic agent"
@@ -178,12 +178,14 @@ $SSHCOMMAND sudo yum install -y newrelic-php5
 $SSHCOMMAND sudo newrelic-install install 
 
 # copy the newrelic config to local
-scp -q -i $keylocation ec2-user@$serveraddress:/etc/newrelic/newrelic.cfg ./newrelic.cfg
+$SSHCOMMAND sudo cp /etc/newrelic/newrelic.cfg /home/ec2-user/newrelic.cfg 
+$SSHCOMMAND sudo chmod 777 /home/ec2-user/newrelic.cfg
+scp -q -i $keylocation ec2-user@$serveraddress:/home/ec2-user/newrelic.cfg ./newrelic.cfg
 cat ./newrelic.cfg | grep -v license_key > ./newrelic.new
 echo license_key=$NEWRELIC_LICENSE_KEY >> ./newrelic.new
 rm ./newrelic.cfg
 mv ./newrelic.new ./newrelic.cfg
-scp -q  -i $keylocation ./newrelic.cfg ec2-user@$serveraddress:~/newrelic.cfg
+scp -q  -i $keylocation ./newrelic.cfg ec2-user@$serveraddress:/home/ec2-user/newrelic.cfg
 rm ./newrelic.cfg
 $SSHCOMMAND sudo mv /home/ec2-user/newrelic.cfg /etc/newrelic/newrelic.cfg 
 $SSHCOMMAND sudo /etc/init.d/newrelic-daemon restart
