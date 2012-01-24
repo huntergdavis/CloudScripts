@@ -14,7 +14,6 @@ then
         exit 0;
 fi
 
-
 # we must now log into amazon and create a server
 # we use the aws controller script for this
 # it requires us to have EC2_ACCESS_KEY and EC2_SECRET_KEY environment variables set
