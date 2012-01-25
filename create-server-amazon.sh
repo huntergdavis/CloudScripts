@@ -1,10 +1,13 @@
-while getopts "n:h:g:" opt;
+while getopts "n:h:g:k:a:i:" opt;
 do
         case $opt in
+        a) AMAZON_INSTANCE_NAME=$OPTARG ;;
         n) hostname=$OPTARG ;;
-		g) GROUP_NAME=$OPTARG ;;
-        h) echo "Usage: create-server-amazon -n SERVERNAME (optional -g security group parameter)"; exit 1 ;;
-        *) echo "Usage: create-server-amazon -n SERVERNAME (optioanl -g security group parameter)"; exit 1 ;;
+		g) SECURITY_GROUP_NAME=$OPTARG ;;
+		k) SSH_KEY_NAME=$OPTARG ;;
+		i) AMAZON_INSTANCE_SIZE=$OPTARG ;;
+        h) echo "Usage: create-server-amazon -n SERVERNAME (optional -g security group parameter, optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size')"; exit 1 ;;
+        *) echo "Usage: create-server-amazon -n SERVERNAME (optioanl -g security group parameter, optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size')"; exit 1 ;;
         esac
 done
 
@@ -28,41 +31,60 @@ fi
 
 if [ -z "$EC2_SECRET_KEY" ];
 then
-	echo "Must have set EC2_SECRET_KEY"
+	echo "Must have set EC2_SECRET_KEY env variable"
 	exit 0;
 fi
 
-if [ -z "$GROUP_NAME" ];
+if [ -z "$SECURITY_GROUP_NAME" ];
 then
 	echo "Must have set GROUP_NAME env variable or passed it in with -g"
 	exit 0;
 fi
 
 # uncomment to test if aws is working
-#./aws describe-instances
+#./aws/aws describe-instances
 
-# have aws create a new ssh-key for this new EC2 instance
-echo "Adding a new keypair named" $hostname.key
-./aws add-keypair $hostname > $hostname.key
-chmod 600 ./$hostname.key
+if [ -z "$SSH_KEY_NAME" ];
+then
+	# have aws create a new ssh-key for this new EC2 instance
+	echo "Adding a new keypair named" $hostname.key
+	./aws/aws add-keypair $hostname > $hostname.key
+	chmod 600 ./$hostname.key
+	SSH_KEY_ARGUMENT=" -k $hostname ";
+else
+	SSH_KEY_ARGUMENT=" -k $SSH_KEY_NAME ";
+fi
+
+if [ -z "$AMAZON_INSTANCE_NAME" ];
+then
+	echo "No Amazon Instance Name Set, using default 32-bit Amazon Linux AMI: ami-31814f58"
+	AMAZON_INSTANCE_NAME="ami-31814f58";
+fi
+
+if [ -z "$AMAZON_INSTANCE_SIZE" ];
+then
+	echo "No Amazon Instance Size Set, using default size m1.small"
+	AMAZON_INSTANCE_SIZE="m1.small";
+fi
 
 # have aws create a new server instance 
-echo "Create Server Instance with Security Group $GROUP_NAME"
-./aws run-instances ami-31814f58 -t m1.small -g $GROUP_NAME -k $hostname
+echo "Create Server Instance with Security Group $SECURITY_GROUP_NAME"
+echo ./aws/aws run-instances $AMAZON_INSTANCE_NAME -t $AMAZON_INSTANCE_SIZE -g $SECURITY_GROUP_NAME $SSH_KEY_ARGUMENT
+exit 1;
 
 # now sleep for a minute while we wait for amazon to setup the server instance
 echo "Sleeping for 60 seconds for Amazon setup time"
 sleep 60
 
 # list the server and make sure it's connecting using the servername key we passed in
-export SERVER_CREATED=`./aws describe-instances | grep $hostname`;
+export SERVER_CREATED=`./aws/aws describe-instances | grep $hostname`;
 
 if [ -z "$SERVER_CREATED" ];
 then
 	echo "Problem With Server Creation";
 	echo "Server not Created after 60 seconds";
 	echo "Log Into EC2 Console and Debug!";
-	echo "response: EC2 ERROR, Not Created"
+	echo "EC2 ERROR, Not Created"
 	exit 0;
 fi
 
@@ -70,5 +92,5 @@ fi
 export SERVERNAME=`echo $SERVER_CREATED | awk -F"|" '{print $6}'`
 
 # print the server name for the script
-echo "response: $SERVERNAME"
+echo "$SERVERNAME"
 exit 1;

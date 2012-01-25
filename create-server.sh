@@ -1,13 +1,18 @@
 #!/bin/bash
 
-while getopts "s:n:h:g:" opt;
+while getopts "s:n:h:g:k:a:i:d:r:" opt;
 do
 	case $opt in
+	a) AMAZON_INSTANCE="-a $OPTARG" ;;
+	d) RACKSPACE_SERVER_SIZE="-d $OPTARG" ;;
 	s) service=$OPTARG ;;
 	n) hostname=$OPTARG ;;
 	g) GROUP_NAME=$OPTARG ;;
-	h) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -g 'amazon security group name')"; exit 1 ;;
-	*) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -g 'amazon security group name')" ; exit 1 ;;
+	i) AMAZON_INSTANCE_SIZE=" -i $OPTARG" ;;
+	k) PUBLIC_KEY=$OPTARG ;;
+	r) RACKSPACE_INSTANCE_NAME="-r $OPTARG" ;;
+	h) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')"; exit 1 ;;
+	*) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')" ; exit 1 ;;
 	esac
 done
 
@@ -20,16 +25,9 @@ fi
 
 if [ "$service" = "rackspace" ];
 then
-        ./create-server-rackspace.sh -n $hostname
+        ./create-server-rackspace.sh -n $hostname $RACKSPACE_SERVER_SIZE $RACKSPACE_INSTANCE_NAME
         exit 1;
 fi
-
-if [ "$service" = "rackspace-db" ];
-then
-        ./create-server-rackspace.sh -n $hostname -d 1
-        exit 1;
-fi
-
 
 if [ -z "$GROUP_NAME" ];
 then
@@ -37,11 +35,17 @@ then
 	exit 0;
 fi
 
+if [ -z "$PUBLIC_KEY" ];
+then
+	KEYARG="";
+else
+	KEYARG=" -k $PUBLIC_KEY"
+fi
 
 
 if [ "$service" = "amazon" ];
 then
-	./create-server-amazon.sh -n $hostname -g $GROUP_NAME
+	./create-server-amazon.sh -n $hostname -g $GROUP_NAME $KEYARG $AMAZON_INSTANCE $AMAZON_INSTANCE_SIZE
 	exit 1;
 fi
 
