@@ -3,9 +3,9 @@ do
         case $opt in
         n) hostname=$OPTARG ;;
 		d) SERVER_SIZE=$OPTARG ;;
-		r) RACKSPACE_INSTANCE_NAME=$OPTARG ;;
-        h) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'rackspace VM instance name')"; exit 1 ;;
-        *) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'rackspace VM instance name')"; exit 1 ;;
+		r) IMAGE_NAME=$OPTARG ;;
+        h) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
+        *) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
         esac
 done
 
@@ -29,14 +29,13 @@ fi
 
 if [ -z "$RACKSPACE_API_KEY" ];
 then
-	echo "Must have set RACKSPACE_API_KEY"
+	echo "Must have set RACKSPACE_API_KEY env variable"
 	exit 0;
 fi
 
 # uncomment to test if aws is working
 #./rscurl.sh -a $RACKSPACE_API_KEY -u $RACKSPACE_USERNAME -c list-flavors
 
-# set the database argument to 4 (2048 megs) or 6 (8092 megs) for creation
 if [ -z "$SERVER_SIZE" ];
 then
 	echo "Defaulting to default rackspace server size 4 (2048)"
@@ -45,13 +44,12 @@ else
 	SERVER_SIZE_ARGUMENT=$SERVER_SIZE;
 fi
 
-# set the database argument to 4 (2048 megs) or 6 (8092 megs) for creation
-if [ -z "$RACKSPACE_INSTANCE_NAME" ];
+if [ -z "$IMAGE_NAME" ];
 then
 	echo "Defaulting to default rackspace instance of 118 (centos 32-bit linux)"
 	RACKSPACE_INSTANCE_ARGUMENT=118;
 else
-	RACKSPACE_INSTANCE_ARGUMENT=$RACKSPACE_INSTANCE_NAME;
+	RACKSPACE_INSTANCE_ARGUMENT=$IMAGE_NAME;
 fi
 
 # have rackspace create a new server instance 

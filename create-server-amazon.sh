@@ -1,7 +1,7 @@
 while getopts "n:h:g:k:a:i:" opt;
 do
         case $opt in
-        a) AMAZON_INSTANCE_NAME=$OPTARG ;;
+        a) IMAGE_NAME=$OPTARG ;;
         n) hostname=$OPTARG ;;
 		g) SECURITY_GROUP_NAME=$OPTARG ;;
 		k) SSH_KEY_NAME=$OPTARG ;;
@@ -55,9 +55,9 @@ else
 	SSH_KEY_ARGUMENT=" -k $SSH_KEY_NAME ";
 fi
 
-if [ -z "$AMAZON_INSTANCE_NAME" ];
+if [ -z "$IMAGE_NAME" ];
 then
-	echo "No Amazon Instance Name Set, using default 32-bit Amazon Linux AMI: ami-31814f58"
+	echo "No Amazon Instance Name Set, set IMAGE_NAME to change, using default 32-bit Amazon Linux AMI: ami-31814f58"
 	AMAZON_INSTANCE_NAME="ami-31814f58";
 fi
 
@@ -69,7 +69,7 @@ fi
 
 # have aws create a new server instance 
 echo "Create Server Instance with Security Group $SECURITY_GROUP_NAME"
-echo ./aws/aws run-instances $AMAZON_INSTANCE_NAME -t $AMAZON_INSTANCE_SIZE -g $SECURITY_GROUP_NAME $SSH_KEY_ARGUMENT
+echo ./aws/aws run-instances $IMAGE_NAME -t $AMAZON_INSTANCE_SIZE -g $SECURITY_GROUP_NAME $SSH_KEY_ARGUMENT
 exit 1;
 
 # now sleep for a minute while we wait for amazon to setup the server instance
