@@ -29,12 +29,6 @@ then
         exit 1;
 fi
 
-if [ -z "$GROUP_NAME" ];
-then
-	echo "Either set GROUP_NAME env variable or pass -g flag for amazon security group name"
-	exit 0;
-fi
-
 if [ -z "$PUBLIC_KEY" ];
 then
 	KEYARG="";
@@ -45,10 +39,10 @@ fi
 
 if [ "$service" = "amazon" ];
 then
-	./create-server-amazon.sh -n $hostname -g $GROUP_NAME $KEYARG $AMAZON_INSTANCE $AMAZON_INSTANCE_SIZE
+	./create-server-amazon.sh -n $hostname -g $SECURITY_GROUP_NAME $KEYARG $AMAZON_INSTANCE $AMAZON_INSTANCE_SIZE
 	exit 1;
 fi
 
-echo "You Must Enter A Service Type -s (either amazon or rackspace or rackspace-db)"
+echo "You Must Enter A Service Type -s (either amazon or rackspace)"
 exit 1;
 
