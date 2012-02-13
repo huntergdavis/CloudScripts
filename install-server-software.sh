@@ -26,7 +26,7 @@ then
         exit 0;
 fi
 
-export SSHCOMMAND="ssh -o StrictHostKeyChecking=no -q -i $keylocation ec2-user@$serveraddress "
+export SSHCOMMAND="ssh -t -o StrictHostKeyChecking=no -q -i $keylocation ec2-user@$serveraddress "
 
 # test that our connection works
 

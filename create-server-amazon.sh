@@ -1,7 +1,7 @@
 while getopts "n:h:g:k:a:i:" opt;
 do
         case $opt in
-        a) IMAGE_NAME=$OPTARG ;;
+        a) AMAZON_INSTANCE_NAME=$OPTARG ;;
         n) hostname=$OPTARG ;;
 		g) SECURITY_GROUP_NAME=$OPTARG ;;
 		k) SSH_KEY_NAME=$OPTARG ;;
@@ -55,7 +55,7 @@ else
 	SSH_KEY_ARGUMENT=" -k $SSH_KEY_NAME ";
 fi
 
-if [ -z "$IMAGE_NAME" ];
+if [ -z "$AMAZON_INSTANCE_NAME" ];
 then
 	echo "No Amazon Instance Name Set, set IMAGE_NAME to change, using default 32-bit Amazon Linux AMI: ami-31814f58"
 	AMAZON_INSTANCE_NAME="ami-31814f58";
@@ -69,28 +69,37 @@ fi
 
 # have aws create a new server instance 
 echo "Create Server Instance with Security Group $SECURITY_GROUP_NAME"
-echo ./aws/aws run-instances $IMAGE_NAME -t $AMAZON_INSTANCE_SIZE -g $SECURITY_GROUP_NAME $SSH_KEY_ARGUMENT
-exit 1;
+RUN_INSTANCE=`./aws/aws run-instances $AMAZON_INSTANCE_NAME -t $AMAZON_INSTANCE_SIZE -g $SECURITY_GROUP_NAME $SSH_KEY_ARGUMENT`
+
+INITIALIZEDNAME=`echo $RUN_INSTANCE | awk -F"|" '{print $18}'`
+
+echo "initialized instance name: $INITIALIZEDNAME"
 
 # now sleep for a minute while we wait for amazon to setup the server instance
 echo "Sleeping for 60 seconds for Amazon setup time"
-sleep 60
+sleep 60;
 
 # list the server and make sure it's connecting using the servername key we passed in
-export SERVER_CREATED=`./aws/aws describe-instances | grep $hostname`;
+export SERVER_CREATED=`./aws/aws describe-instances | grep $INITIALIZEDNAME | grep running`;
 
 if [ -z "$SERVER_CREATED" ];
 then
 	echo "Problem With Server Creation";
-	echo "Server not Created after 60 seconds";
+	echo "Server not Created after 260 seconds";
 	echo "Log Into EC2 Console and Debug!";
 	echo "EC2 ERROR, Not Created"
 	exit 0;
 fi
 
-# use AWK to pull out the new server name
-export SERVERNAME=`echo $SERVER_CREATED | awk -F"|" '{print $6}'`
+#echo $SERVER_CREATED
 
-# print the server name for the script
-echo "$SERVERNAME"
-exit 1;
+# use AWK to pull out the new server name
+#export SERVERNAME=`echo $SERVER_CREATED | awk -F"|" '{print $6}'`
+
+# print the server name for the script draft 1
+#echo "$SERVERNAME"
+#exit 1;
+
+# execute the security script draft 2
+echo ./secure-server-amazon.sh -s $INITIALIZEDNAME $SSH_KEY_ARGUMENT 
+./secure-server-amazon.sh -s $INITIALIZEDNAME $SSH_KEY_ARGUMENT 
