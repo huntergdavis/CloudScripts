@@ -30,7 +30,7 @@ echo "send \"useradd rackspace-user\r\"" >> ./rackspace-expect-script.sh
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
 echo "send \"echo \\\"rackspace-user ALL=(ALL) NOPASSWD: ALL\\\" >> /etc/sudoers\r\"" >> ./rackspace-expect-script.sh 
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh
-echo "send \"cat /etc/ssh/sshd_config | grep -v PasswordAuthentication > ./sshd_config \r\"" >> ./rackspace-expect-script.sh  
+echo "send \"cat /etc/ssh/sshd_config | grep -v PasswordAuthentication | grep -v PAM > ./sshd_config \r\"" >> ./rackspace-expect-script.sh  
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
 echo "send \"echo PasswordAuthentication no >> ./sshd_config \r\"" >> ./rackspace-expect-script.sh 
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
@@ -41,6 +41,8 @@ echo "expect \"*]\"" >> ./rackspace-expect-script.sh
 echo "send \"echo AuthorizedKeysFile     .ssh/authorized_keys >> ./sshd_config \r\"" >> ./rackspace-expect-script.sh 
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
 echo "send \"echo PermitRootLogin no >> ./sshd_config \r\"" >> ./rackspace-expect-script.sh 
+echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
+echo "send \"echo UsePAM no >> ./sshd_config \r\"" >> ./rackspace-expect-script.sh 
 echo "expect \"*]\"" >> ./rackspace-expect-script.sh 
 echo "send \"cat ./sshd_config > /etc/ssh/sshd_config \r\"" >> ./rackspace-expect-script.sh 
 echo "send \"su rackspace-user\r\"" >> ./rackspace-expect-script.sh 
@@ -70,7 +72,7 @@ echo "send \"exit\r\"" >> ./rackspace-expect-script.sh
 chmod +x ./rackspace-expect-script.sh
 ./rackspace-expect-script.sh
 
-echo rm ./rackspace-expect-script.sh 
+rm ./rackspace-expect-script.sh 
 
 export SSHCOMMAND="ssh -t -o StrictHostKeyChecking=no -q -i $keylocation.key -l rackspace-user $IP_ADDRESS "
 HOSTNAMETEST=`$SSHCOMMAND sudo hostname | grep tty`
