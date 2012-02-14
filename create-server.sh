@@ -11,8 +11,8 @@ do
 	i) AMAZON_INSTANCE_SIZE=" -i $OPTARG" ;;
 	k) PUBLIC_KEY=$OPTARG ;;
 	r) RACKSPACE_INSTANCE_NAME="-r $OPTARG" ;;
-	h) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')"; exit 1 ;;
-	*) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')" ; exit 1 ;;
+	h) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon/rackspace ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')"; exit 1 ;;
+	*) echo "Usage: create-server -n SERVERNAME -s SERVERTYPE (optional -d 'rackspace instance size', optional -g 'amazon security group name', optional -k 'public amazon/rackspace ssh key', optional -a 'amazon ami instance name', optional -i 'amazon instance size', optional -r 'rackspace VM instance name')" ; exit 1 ;;
 	esac
 done
 
@@ -25,7 +25,7 @@ fi
 
 if [ "$service" = "rackspace" ];
 then
-        ./create-server-rackspace.sh -n $hostname $RACKSPACE_SERVER_SIZE $RACKSPACE_INSTANCE_NAME
+        ./create-server-rackspace.sh -n $hostname $RACKSPACE_SERVER_SIZE $RACKSPACE_INSTANCE_NAME -k $PUBLIC_KEY
         exit 1;
 fi
 

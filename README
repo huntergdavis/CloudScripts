@@ -2,3 +2,15 @@ This is a set of scripts for cloud server management
 
 uses RSCURL from https://github.com/jsquared/rscurl
 uses AWS from http://timkay.com/aws/
+
+
+Example - Create a server on rackspace and lock it down so that only the passed-in ssh key will work and only for rackspace-user account
+
+# First make sure you have your rackspace username and api key exported like
+export RACKSPACE_USERNAME=yourusername
+export RACKSPACE_API_KEY=yourapikey
+
+# make sure you have yourSSHkey.key and yourSSHkey.pub 
+# now create the server and lock it down like so
+./create-server.sh -n yourservername -s rackspace -k yourSSHkey 
+

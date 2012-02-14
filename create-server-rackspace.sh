@@ -1,11 +1,12 @@
-while getopts "n:h:d:r:" opt;
+while getopts "n:h:d:r:k:" opt;
 do
         case $opt in
         n) hostname=$OPTARG ;;
 		d) SERVER_SIZE=$OPTARG ;;
 		r) IMAGE_NAME=$OPTARG ;;
-        h) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
-        *) echo "Usage: create-server-rackspace -n SERVERNAME (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
+		k) PUBLIC_KEY=$OPTARG ;;
+        h) echo "Usage: create-server-rackspace -n SERVERNAME -k security_key_name (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
+        *) echo "Usage: create-server-rackspace -n SERVERNAME -k security_key_name (optional -d 'size' parameter maps to rackspace size option, optional -r 'image instance name')"; exit 1 ;;
         esac
 done
 
@@ -68,10 +69,19 @@ then
 fi
 
 # use AWK to pull out the new server password
-export SERVERNAME=`echo $SERVER_CREATED | awk '{print $20}'`
-export SERVERPASS=`echo $SERVER_CREATED | awk '{print $19}'`
+export SERVERNAME=`echo $SERVER_CREATED | awk '{print $20}' | tr -d '[\" \"]'`
+export SERVERPASS=`echo $SERVER_CREATED | awk '{print $19}' | tr -d '\" \"'`
 
+# sleep for 5 seconds to let the ip address proliferate
+echo "pinging till server is finished building, please be very patient"
+while true; do ping -c 1 $SERVERNAME > /dev/null && break ; done
 
 # print the server name for the script
 echo "IP: $SERVERNAME PASS: $SERVERPASS"
-exit 1;
+#exit 1;
+
+# secure the server
+./secure-server-rackspace.sh -s $SERVERNAME -p $SERVERPASS -k $PUBLIC_KEY
+
+
+

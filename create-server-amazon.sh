@@ -102,4 +102,4 @@ fi
 
 # execute the security script draft 2
 echo ./secure-server-amazon.sh -s $INITIALIZEDNAME $SSH_KEY_ARGUMENT 
-./secure-server-amazon.sh -s $INITIALIZEDNAME $SSH_KEY_ARGUMENT 
+./secure-server-amazon.sh -s $INITIALIZEDNAME -k $SSH_KEY_ARGUMENT 
